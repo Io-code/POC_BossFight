@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="LifeBehaviour">
+    <Position X="9" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAQAAAAAAAAAAAAAAAAgAAAgEA=</HashCode>
+      <FileName>Assets\Script\LifeBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossController">
+    <Position X="10" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAIAAARAAAAAAAAAIAAAAAAAAAAAAADABAAAAIQAABA=</HashCode>
+      <FileName>Assets\Script\BossController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="animator" />
+      <Field Name="animOveride" />
+      <Field Name="target" />
+      <Field Name="currentPattern" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="patterns" />
+      <Field Name="hitZones" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="CharacterController">
+    <Position X="6.25" Y="4" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="CharacterController.PlayerState">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Script\CharacterController.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BAAAACBAAgAAAAgAAAAAEAAAAIAAAQCAFAAAEAAAAAA=</HashCode>
+      <FileName>Assets\Script\CharacterController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="hitZone" />
+      <Field Name="animator" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UnityEngine.Animator" Collapsed="true">
+    <Position X="12.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="UnityEngine.AnimatorOverrideController" Collapsed="true">
+    <Position X="12.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="BossPattern">
+    <Position X="12.75" Y="6" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="BossPattern.PatternType">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Script\BossPattern.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAQAAAAIiAAAAACQAAAAAAAQAA=</HashCode>
+      <FileName>Assets\Script\BossPattern.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="animPattern" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UnityEngine.AnimationClip" Collapsed="true">
+    <Position X="12.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="HitZone">
+    <Position X="9" Y="7.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAAAAAAAAAQAAAAAAAQAA=</HashCode>
+      <FileName>Assets\Script\HitZone.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="hurtTarget" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
