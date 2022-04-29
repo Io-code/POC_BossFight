@@ -16,12 +16,16 @@ public class BossInput : MonoBehaviour
 
     [Header("RelativeParameter")]
     public bool move;
+    public bool selfOriented;
     public float speed;
     public float dist;
-    Vector3 movedir,startPos;
+    Vector3 dir,startPos;
+
     public bool relativDist;
+    bool triggerRDist;
 
-
+    public bool relativPos;
+    bool triggerRPos;
 
 
 
@@ -34,39 +38,48 @@ public class BossInput : MonoBehaviour
 
         SetOrientation();
         Move();
-
-        if (updateTarget)
-            UpdateTarget();
+        ApplyUpdateTarget();
     }
-
-    public void Move()
+    #region Self displacement
+    public Vector3 MoveVec()
     {
         Vector3 targetVec = ((T_OffsetPos() - transform.position).normalized) * ((T_OffsetPos() - transform.position).magnitude - dist);
         Vector3 relativVec = (Vector3.Distance(transform.position, startPos + T_OffsetDir().normalized * dist)) * ((startPos + T_OffsetDir().normalized * dist) - transform.position).normalized;
 
-        Vector3 moveVec = (relativDist) ? relativVec : targetVec;
-
-        Vector3 velocity = moveVec.normalized * Mathf.Clamp(moveVec.magnitude *speed, 0,speed) ;
-
+        return (relativDist) ? relativVec : targetVec;
+    }
+    public void Move()
+    {
+        Vector3 velocity = MoveVec().normalized * Mathf.Clamp(MoveVec().magnitude *speed, 0,speed) ;
         if(move)
             transform.position += velocity * Time.deltaTime;
     }
     public void SetOrientation()
     {
-        Vector3 newMoveDir = T_OffsetPos() - transform.position;
+        Vector3 newDir =(selfOriented)? MoveVec().normalized : (T_OffsetPos() - transform.position);
 
-        if (newMoveDir != Vector3.zero)
-            movedir = newMoveDir.normalized;
+        if (newDir != Vector3.zero)
+            dir = newDir.normalized;
 
-        transform.right = movedir.normalized;
+        transform.right = dir.normalized;
     }
-
+    #endregion
     #region target
     [ContextMenu("UpdateTarget")]
     public void UpdateTarget()
     {
- 
-
+        if (relativPos)
+        {
+            if(MoveVec().magnitude < 0.1f)
+            {
+                startPos = transform.position;
+                targetPos = transform.position + transform.right * 0.1f;
+                targetDir = targetPos - startPos;
+                targetDir.y = 0;
+            }
+        }
+        else
+        {
             if (Vector3.Distance(target.position, targetPos) > 0.5f)
             {
                 startPos = transform.position;
@@ -74,12 +87,26 @@ public class BossInput : MonoBehaviour
                 targetDir = targetPos - startPos;
                 targetDir.y = 0;
             }
-        
+        }
     }
-    
+    public void ApplyUpdateTarget()
+    {
+        if (updateTarget)
+            UpdateTarget();
+        if (triggerRDist != relativDist || triggerRPos != relativPos)
+        {
+            triggerRDist = relativDist;
+            triggerRPos = relativPos;
+
+            UpdateTarget();
+        }
+    }
     public Vector3 T_OffsetPos()
     {
         float dirRad = Mathf.Atan2(targetDir.z, targetDir.x);
+        if (relativPos)
+            dirRad = 0;
+
         Vector3 offset = new Vector3(Mathf.Cos(dirRad + angleOffset * Mathf.Deg2Rad), 0, Mathf.Sin(dirRad + angleOffset * Mathf.Deg2Rad));
 
         Vector3 pos = targetPos+ offset.normalized * offsetDist;
@@ -96,12 +123,15 @@ public class BossInput : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(startPos, 0.2f);
+
         Gizmos.color = Color.magenta;
         Gizmos.DrawSphere(targetPos, 0.1f);
 
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(T_OffsetPos(), 0.2f);
-        Gizmos.DrawRay(transform.position, T_OffsetDir());
+        Gizmos.DrawRay(transform.position, T_OffsetDir().normalized * MoveVec().magnitude);
         Gizmos.DrawWireSphere((relativDist)?startPos:T_OffsetPos(), Mathf.Abs( dist));
     }
 
