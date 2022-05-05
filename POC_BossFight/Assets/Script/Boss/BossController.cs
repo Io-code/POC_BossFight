@@ -5,39 +5,37 @@ using UnityEngine;
 public class BossController : MonoBehaviour
 {
     public BossInput bInput;
-    public Animator animator;
     Vector3 velocity;
     float targetDist;
+
+    [Header("Animator")]
+    public Animator animator;
+    public AnimatorOverrideController overrider;
+
     [Header("Pattern")]
     public float patternFreq = 1;
     float patternTimer;
     int pattern;
 
+    [Header("Debug")]
+    public List<AnimatorOverrideController> overriders; // debug
+    int currentOverride = 0; // debug
+
     private void Update()
     {
-        patternTimer -= Time.deltaTime;
-        if(patternTimer <= 0 && pattern == 0)
+        #region Select pattern
+        if (pattern == 0)
+            patternTimer -= Time.deltaTime;
+
+        if(patternTimer <= 0)
         {
             pattern = (Random.value > 0.5f) ? 1 : 2;
-            //animator.SetTrigger((Random.value > 0.5f) ? "TrigDash" : "TrigAtt");
             patternTimer = patternFreq;
         }
-
-        // apply pattern
-        if(pattern == 1 && targetDist <= 0.7)
-        {
-            animator.SetTrigger("TrigAtt");
-            pattern = 0;
-        }
-
-        if (pattern == 2 && targetDist <= 3.5)
-        {
-            animator.SetTrigger("TrigDash");
-            pattern = 0;
-        }
+        #endregion
 
         Move();
-        SetAnimParam();
+        //SetAnimParam();
     }
     public void Move()
     {
@@ -54,6 +52,8 @@ public class BossController : MonoBehaviour
 
         transform.right = (velocity != Vector3.zero)? velocity.normalized : bInput.targetDir;
     }
+
+    #region Animator
     public void SetAnimParam()
     {
         
@@ -62,9 +62,40 @@ public class BossController : MonoBehaviour
             animator.SetFloat("Blend", 1);
         if(targetDist < 0.5)
             animator.SetFloat("Blend", 0);
+
+        // apply pattern
+        if (pattern == 1 && targetDist <= 0.7)
+        {
+            animator.SetTrigger("TrigAtt");
+            pattern = 0;
+        }
+
+        if (pattern == 2 && targetDist <= 3.5)
+        {
+            animator.SetTrigger("TrigDash");
+            pattern = 0;
+        }
     }
 
-    
+    public void SetAnimOverride(AnimatorOverrideController overrider)
+    {
+        animator.runtimeAnimatorController = overrider;
+    }
+    public void SetAnimationClip(AnimationClip clip, AnimatorOverrideController overrider)
+    {
+        overrider.animationClips[1] = clip;
+    }
 
+    public void DebugOverride()
+    {
+        SetAnimOverride(overriders[currentOverride]);
+        currentOverride = (currentOverride + 1) % overriders.Count;
+    }
+
+    public void DebugPlayAnim()
+    {
+        animator.SetTrigger("TrigP");
+    }
+    #endregion
 
 }
