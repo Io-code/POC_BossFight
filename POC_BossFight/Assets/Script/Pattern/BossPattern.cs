@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName ="Pattern",menuName ="Scriptable/Pattern")]
-public class Pattern : ScriptableObject
+public class BossPattern : ScriptableObject
 {
     public AnimationClip moveInClip, attackClip;
+    public float startDelay = 1;
 
     [Header("Trigger Attack")]
     public float attackDist = 1; 
@@ -15,7 +16,7 @@ public class Pattern : ScriptableObject
     [System.Serializable]
     public struct NextPattern
     {
-        public Pattern pattern;
+        public BossPattern pattern;
         public float weight;
     }
 }

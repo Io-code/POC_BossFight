@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveInClip: {fileID: 0}
   attackClip: {fileID: 0}
+  startDelay: 1
   attackDist: 1
   marginDist: 0.5
   nextPatterns: []

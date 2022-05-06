@@ -13,7 +13,8 @@ public class BossController : MonoBehaviour
     public AnimatorOverrideController overrider;
 
     [Header("Pattern")]
-    public float patternFreq = 1;
+    public List<BossPattern> patterns;
+    public float patternDelay = 1;
     float patternTimer;
     int pattern;
 
@@ -30,7 +31,7 @@ public class BossController : MonoBehaviour
         if(patternTimer <= 0)
         {
             pattern = (Random.value > 0.5f) ? 1 : 2;
-            patternTimer = patternFreq;
+            patternTimer = patternDelay;
         }
         #endregion
 
