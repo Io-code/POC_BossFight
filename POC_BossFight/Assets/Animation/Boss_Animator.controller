@@ -227,8 +227,8 @@ AnimatorStateMachine:
     m_State: {fileID: -3980781966862593826}
     m_Position: {x: 250, y: 200, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 7088484333713374533}
-    m_Position: {x: 470.61102, y: -10.016083, z: 0}
+    m_State: {fileID: 5705078109848593486}
+    m_Position: {x: 386.55554, y: -36.45166, z: 0}
   m_ChildStateMachines:
   - serializedVersion: 1
     m_StateMachine: {fileID: -537094566009277004}
@@ -269,14 +269,14 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
---- !u!1102 &7088484333713374533
+--- !u!1102 &5705078109848593486
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: B_PSweep
+  m_Name: B_PKickOut
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -289,7 +289,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 531d3a1c22cb873459ce38f11ba42bfb, type: 2}
+  m_Motion: {fileID: 7400000, guid: ca22a30908fae164180c52d7d769dcf3, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

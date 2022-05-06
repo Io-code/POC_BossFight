@@ -6,7 +6,7 @@ using UnityEngine;
 public class BossPattern : ScriptableObject
 {
     public AnimationClip moveInClip, attackClip;
-    public float startDelay = 1;
+    public float startDelay = 1; 
 
     [Header("Trigger Attack")]
     public float attackDist = 1; 
