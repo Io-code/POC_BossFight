@@ -14,8 +14,9 @@ public class BossController : MonoBehaviour
 
     [Header("Pattern")]
     public List<B_Pattern> patterns;
-    public float patternDelay = 1;
-    float patternTimer;
+    int pIndex = 0;
+
+    float patternTimer = 0;
     int pattern;
 
     [Header("Debug")]
@@ -24,19 +25,13 @@ public class BossController : MonoBehaviour
 
     private void Update()
     {
-        #region Select pattern
-        if (pattern == 0)
-            patternTimer -= Time.deltaTime;
-
-        if(patternTimer <= 0)
-        {
-            pattern = (Random.value > 0.5f) ? 1 : 2;
-            patternTimer = patternDelay;
-        }
-        #endregion
 
         Move();
         //SetAnimParam();
+    }
+    public void SelectPattern()
+    {
+
     }
     public void Move()
     {
@@ -51,52 +46,22 @@ public class BossController : MonoBehaviour
         transform.position += velocity * Time.deltaTime;
         targetDist = (transform.position - bInput.targetPos).magnitude - 1.2f;
 
-        transform.right = (velocity != Vector3.zero)? velocity.normalized : bInput.targetDir;
+        if (bInput.updateDir) 
+            transform.right = (velocity != Vector3.zero)? velocity.normalized : bInput.targetDir;
     }
 
     #region Animator
     public void SetAnimParam()
     {
-        
-        animator.SetFloat("Blend",Mathf.Clamp01(velocity.magnitude * 0.6f));
-        if(targetDist > 1)
-            animator.SetFloat("Blend", 1);
-        if(targetDist < 0.5)
-            animator.SetFloat("Blend", 0);
+        animator.SetFloat("Move", Mathf.Clamp01(velocity.magnitude*0.8f));
 
-        // apply pattern
-        if (pattern == 1 && targetDist <= 0.7)
-        {
-            animator.SetTrigger("TrigAtt");
-            pattern = 0;
-        }
-
-        if (pattern == 2 && targetDist <= 3.5)
-        {
-            animator.SetTrigger("TrigDash");
-            pattern = 0;
-        }
     }
 
-    public void SetAnimOverride(AnimatorOverrideController overrider)
+    public void SetAnimationClip(AnimatorOverrideController overrider, int clipIndex, AnimationClip clip )
     {
-        animator.runtimeAnimatorController = overrider;
-    }
-    public void SetAnimationClip(AnimationClip clip, AnimatorOverrideController overrider)
-    {
-        overrider.animationClips[1] = clip;
+        overrider.animationClips[clipIndex] = clip;
     }
 
-    public void DebugOverride()
-    {
-        SetAnimOverride(overriders[currentOverride]);
-        currentOverride = (currentOverride + 1) % overriders.Count;
-    }
-
-    public void DebugPlayAnim()
-    {
-        animator.SetTrigger("TrigP");
-    }
     #endregion
 
     [System.Serializable]

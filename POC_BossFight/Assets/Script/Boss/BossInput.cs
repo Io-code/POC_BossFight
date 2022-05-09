@@ -8,7 +8,7 @@ public class BossInput : MonoBehaviour
     public Vector3 targetPos { get; private set; }
     public Vector3 targetDir { get; private set; }
 
-    public bool updateTarget;
+    public bool updateTarget, updateDir;
     public float speed;
     [Range(-180,180)]
     public float angleOffset;
