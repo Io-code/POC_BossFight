@@ -11,12 +11,5 @@ public class BossPattern : ScriptableObject
     [Header("Trigger Attack")]
     public float attackDist = 1; 
     public float marginDist = 0.5f;
-    public List<NextPattern> nextPatterns;
-
-    [System.Serializable]
-    public struct NextPattern
-    {
-        public BossPattern pattern;
-        public float weight;
-    }
+    
 }

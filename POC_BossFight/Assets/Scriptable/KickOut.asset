@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2d4b55d5c0c0e34bb080f3237aaf41e, type: 3}
   m_Name: KickOut
   m_EditorClassIdentifier: 
-  moveClip: {fileID: 0}
-  attackClip: {fileID: 0}
+  moveInClip: {fileID: 7400000, guid: cfc0c95cd86f0304e8b9657536b4158b, type: 2}
+  attackClip: {fileID: 7400000, guid: ca22a30908fae164180c52d7d769dcf3, type: 2}
+  startDelay: 1
   attackDist: 1
   marginDist: 0.5
-  nextPatterns: []

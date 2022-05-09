@@ -13,7 +13,7 @@ public class BossController : MonoBehaviour
     public AnimatorOverrideController overrider;
 
     [Header("Pattern")]
-    public List<BossPattern> patterns;
+    public List<B_Pattern> patterns;
     public float patternDelay = 1;
     float patternTimer;
     int pattern;
@@ -98,5 +98,19 @@ public class BossController : MonoBehaviour
         animator.SetTrigger("TrigP");
     }
     #endregion
+
+    [System.Serializable]
+    public struct B_Pattern
+    {
+        public BossPattern pattern;
+        public List<NextPattern> nextPatterns;
+    }
+
+    [System.Serializable]
+    public struct NextPattern
+    {
+        public BossPattern pattern;
+        public float weight;
+    }
 
 }
