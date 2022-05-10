@@ -13,14 +13,11 @@ public class BossController : MonoBehaviour
     public AnimatorOverrideController overrider;
 
     [Header("Pattern")]
-    public List<B_Pattern> patterns;
+    public List<B_Pattern> bPatterns;
     int pIndex = 0;
+    public AnimationCurve randP;
     float patternTimer = 0;
 
-
-    [Header("Debug")]
-    public List<AnimatorOverrideController> overriders; // debug
-    int currentOverride = 0; // debug
 
     #region Suscribe Event
     private void OnEnable()
@@ -36,18 +33,40 @@ public class BossController : MonoBehaviour
 
     private void Start()
     {
-        pIndex = Random.Range(0, patterns.Count);
+        pIndex = Random.Range(0, bPatterns.Count);
+        animator.runtimeAnimatorController = overrider;
     }
     private void Update()
     {
-
         Move();
         SetAnimParam();
     }
     public void SelectPattern( Animator animator)
     {
+        Debug.Log("SelectPattern");
         if(animator == this.animator)
         {
+            randP = new AnimationCurve();
+            float pWeightSumm = 0;
+            for(int i = 0; i< bPatterns[pIndex].nextPatterns.Count; i++)
+            {
+                pWeightSumm += bPatterns[pIndex].nextPatterns[i].weight;
+                randP.AddKey(pWeightSumm, i);
+            }
+
+            float randChoose = Random.Range(0, pWeightSumm);
+            pIndex = (int)randP.Evaluate(randChoose);
+            patternTimer = bPatterns[pIndex].pattern.startDelay;
+
+            // replace animation clip
+            List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>();
+            Debug.Log(" old " + overrider.animationClips[2].name + " new "+bPatterns[pIndex].pattern.attackClip);
+            overrider.animationClips[2] = bPatterns[pIndex].pattern.attackClip;
+            Debug.Log(" new " + overrider.animationClips[2].name);
+
+            //overrider.animationClips[2] = bPatterns[pIndex].pattern.moveInClip;
+
+            Debug.Log("Select pattern " + pIndex + " at " + randChoose + " range " + pWeightSumm);
             
         }
     }
@@ -67,21 +86,21 @@ public class BossController : MonoBehaviour
         if (bInput.updateDir) 
             transform.right = (velocity != Vector3.zero)? velocity.normalized : bInput.targetDir;
     }
-
-    #region Animator
     public void SetAnimParam()
     {
         animator.SetFloat("Move", Mathf.Clamp01(velocity.magnitude*0.8f));
 
+        // start move in
+        patternTimer -= Time.deltaTime;
+        if (patternTimer <= 0)
+            animator.SetTrigger("Pattern");
+
+        // start attack
+        if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist)
+            animator.SetTrigger("Attack");
     }
 
-    public void SetAnimationClip(AnimatorOverrideController overrider, int clipIndex, AnimationClip clip )
-    {
-        overrider.animationClips[clipIndex] = clip;
-    }
-
-    #endregion
-
+    #region BossPattern
     [System.Serializable]
     public struct B_Pattern
     {
@@ -93,7 +112,7 @@ public class BossController : MonoBehaviour
     public struct NextPattern
     {
         public BossPattern pattern;
-        public float weight;
+        public float weight ;
     }
-
+    #endregion
 }
