@@ -15,23 +15,41 @@ public class BossController : MonoBehaviour
     [Header("Pattern")]
     public List<B_Pattern> patterns;
     int pIndex = 0;
-
     float patternTimer = 0;
-    int pattern;
+
 
     [Header("Debug")]
     public List<AnimatorOverrideController> overriders; // debug
     int currentOverride = 0; // debug
 
+    #region Suscribe Event
+    private void OnEnable()
+    {
+        BossSwitchState.OnEndPattern += SelectPattern;
+    }
+
+    private void OnDisable()
+    {
+        BossSwitchState.OnEndPattern += SelectPattern;
+    }
+    #endregion
+
+    private void Start()
+    {
+        pIndex = Random.Range(0, patterns.Count);
+    }
     private void Update()
     {
 
         Move();
-        //SetAnimParam();
+        SetAnimParam();
     }
-    public void SelectPattern()
+    public void SelectPattern( Animator animator)
     {
-
+        if(animator == this.animator)
+        {
+            
+        }
     }
     public void Move()
     {

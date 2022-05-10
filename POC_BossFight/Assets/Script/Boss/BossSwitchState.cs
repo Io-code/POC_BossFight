@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BossState : StateMachineBehaviour
+public class BossSwitchState : StateMachineBehaviour
 {
+	public delegate void EndBossPattern(Animator animator);
+	public static event EndBossPattern OnEndPattern;
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
 	{
-
+		
 
 	}
 
@@ -19,6 +21,9 @@ public class BossState : StateMachineBehaviour
 	// OnStateExit is called when a transition ends and the state machine finishes evaluating this state
 	override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
 	{
+		//Debug.Log("Tag " + stateInfo.IsName("Attack") + " layer " + layerIndex);
 
+		if (stateInfo.IsName("Attack"))
+			OnEndPattern(animator);
 	}
 }
