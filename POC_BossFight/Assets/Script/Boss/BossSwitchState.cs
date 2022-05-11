@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class BossSwitchState : StateMachineBehaviour
 {
-	public delegate void EndBossPattern(Animator animator);
-	public static event EndBossPattern OnEndPattern;
+	public delegate void SwitchBossPattern(Animator animator);
+	public static event SwitchBossPattern OnEndPattern,OnStartMove;
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
 	{
-		
+		if (stateInfo.IsName("MoveIn"))
+			OnStartMove(animator);
 
 	}
 
