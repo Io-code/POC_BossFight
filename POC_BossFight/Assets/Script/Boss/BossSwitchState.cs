@@ -24,7 +24,7 @@ public class BossSwitchState : StateMachineBehaviour
 	{
 		//Debug.Log("Tag " + stateInfo.IsName("Attack") + " layer " + layerIndex);
 
-		if (stateInfo.IsName("Attack"))
+		if (stateInfo.IsName("Free"))
 			OnEndPattern(animator);
 	}
 }

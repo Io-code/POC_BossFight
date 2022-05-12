@@ -14,9 +14,10 @@ public class BossController : MonoBehaviour
     [Header("Animator")]
     public Animator animator;
     public AnimatorOverrideController overrider;
+    public AnimationClip refAttackClip;
     [Header("Pattern")]
     public List<B_Pattern> bPatterns;
-    int pIndex = 0;
+    public int pIndex = 0;
     public AnimationCurve randP;
     float patternTimer = 0;
 
@@ -37,7 +38,7 @@ public class BossController : MonoBehaviour
 
     private void Start()
     {
-        pIndex = Random.Range(0, bPatterns.Count);
+        //pIndex = Random.Range(0, bPatterns.Count);
         animator.runtimeAnimatorController = overrider;
         
     }
@@ -65,18 +66,35 @@ public class BossController : MonoBehaviour
             patternTimer = bPatterns[pIndex].pattern.startDelay;
 
             // replace animation clip
-            List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
-            overrider.GetOverrides(overrides);
+            //List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
+           // overrider.GetOverrides(overrides);
             //Debug.Log("Pattern nb " + overrider.overridesCount);
-            overrides[2] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[2].Key, bPatterns[pIndex].pattern.attackClip);
+            //overrides[2] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[2].Key, bPatterns[pIndex].pattern.attackClip);
             //overrides[1] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[1].Key, bPatterns[pIndex].pattern.moveInClip);
 
-            overrider.ApplyOverrides(overrides);
+            //overrider.ApplyOverrides(overrides);
 
 
             Debug.Log("Select pattern " + pIndex + " at " + randChoose + " range " + pWeightSumm);
             
         }
+    }
+    public void SwitchPattern()
+    {
+        // replace animation clip
+        List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
+        overrider.GetOverrides(overrides);
+        Debug.Log("Pattern nb " + overrides.Count);
+        for (int i = 0; i < overrides.Count; i++)
+        {
+            Debug.Log("Override "+i+":" + overrides[i]);
+            if(overrides[i].Key == refAttackClip )
+                overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[i].Key, bPatterns[pIndex].pattern.attackClip);
+        }
+        //overrides[2] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[2].Key, bPatterns[pIndex].pattern.attackClip);
+        //overrides[1] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[1].Key, bPatterns[pIndex].pattern.moveInClip);
+
+        overrider.ApplyOverrides(overrides);
     }
     public void SwitchStateMove(Animator animator)
     {
@@ -90,9 +108,9 @@ public class BossController : MonoBehaviour
         float dirRad = Mathf.Atan2(bInput.targetDir.z, bInput.targetDir.x);
 
         Vector3 offsetDir = new Vector3(Mathf.Cos(dirRad + offsetRad), 0, Mathf.Sin(dirRad + offsetRad));
-        float dirSign = Mathf.Sign(  Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist);
+        float dirSign = Mathf.Clamp( Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist,-1,1);
         //Vector3 moveDir = new Vector3(bInput.targetDir.x, 0, bInput.targetDir.z);
-        velocity = offsetDir * bInput.speed * ((bossState == BossState.MOVE)?dirSign : 1) ;
+        velocity = offsetDir * bInput.speed * ((bossState == BossState.MOVE)?dirSign : 1 );
 
         transform.position += velocity * Time.deltaTime;
         targetDist = (transform.position - bInput.targetPos).magnitude - 1.2f;
@@ -110,8 +128,8 @@ public class BossController : MonoBehaviour
             animator.SetTrigger("Pattern");
 
         // start attack
-        if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist)
-            animator.SetTrigger("Attack");
+        //if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
+            //animator.SetTrigger("Attack");
     }
 
     #region BossPattern
@@ -129,4 +147,11 @@ public class BossController : MonoBehaviour
         public float weight ;
     }
     #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(bInput.targetPos, bPatterns[pIndex].pattern.attackDist);
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(bInput.targetPos + (bPatterns[pIndex].pattern.attackDist - bPatterns[pIndex].pattern.marginDist) * -bInput.targetDir, bInput.targetPos + (bPatterns[pIndex].pattern.attackDist + bPatterns[pIndex].pattern.marginDist) * -bInput.targetDir);
+    }
 }
