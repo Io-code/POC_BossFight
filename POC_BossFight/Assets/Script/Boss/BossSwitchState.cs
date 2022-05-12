@@ -5,11 +5,12 @@ using UnityEngine;
 public class BossSwitchState : StateMachineBehaviour
 {
 	public delegate void SwitchBossPattern(Animator animator);
-	public static event SwitchBossPattern OnEndPattern,OnStartMove;
+	public static event SwitchBossPattern OnEndPattern;
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
 	{
-		if (stateInfo.IsName("MoveIn"))
-			OnStartMove(animator);
+
+		if (stateInfo.IsName("Free"))
+			OnEndPattern(animator);
 
 	}
 
@@ -24,7 +25,6 @@ public class BossSwitchState : StateMachineBehaviour
 	{
 		//Debug.Log("Tag " + stateInfo.IsName("Attack") + " layer " + layerIndex);
 
-		if (stateInfo.IsName("Free"))
-			OnEndPattern(animator);
+		
 	}
 }

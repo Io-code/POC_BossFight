@@ -26,13 +26,11 @@ public class BossController : MonoBehaviour
     private void OnEnable()
     {
         BossSwitchState.OnEndPattern += SelectPattern;
-        BossSwitchState.OnStartMove += SwitchStateMove;
     }
 
     private void OnDisable()
     {
         BossSwitchState.OnEndPattern -= SelectPattern;
-        BossSwitchState.OnStartMove -= SwitchStateMove;
     }
     #endregion
 
@@ -62,7 +60,7 @@ public class BossController : MonoBehaviour
             }
 
             float randChoose = Random.Range(0, pWeightSumm);
-            pIndex = (int)randP.Evaluate(randChoose);
+            //pIndex = (int)randP.Evaluate(randChoose);
             patternTimer = bPatterns[pIndex].pattern.startDelay;
 
             // replace animation clip
@@ -96,11 +94,7 @@ public class BossController : MonoBehaviour
 
         overrider.ApplyOverrides(overrides);
     }
-    public void SwitchStateMove(Animator animator)
-    {
-        if(animator == this.animator)
-            bossState = BossState.MOVE;       
-    }
+
     public void Move()
     {
         
@@ -108,9 +102,8 @@ public class BossController : MonoBehaviour
         float dirRad = Mathf.Atan2(bInput.targetDir.z, bInput.targetDir.x);
 
         Vector3 offsetDir = new Vector3(Mathf.Cos(dirRad + offsetRad), 0, Mathf.Sin(dirRad + offsetRad));
-        float dirSign = Mathf.Clamp( Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist,-1,1);
         //Vector3 moveDir = new Vector3(bInput.targetDir.x, 0, bInput.targetDir.z);
-        velocity = offsetDir * bInput.speed * ((bossState == BossState.MOVE)?dirSign : 1 );
+        velocity = offsetDir * bInput.speed * ((bInput.lockDir)? 1 : Mathf.Sign( InAttackRange()));
 
         transform.position += velocity * Time.deltaTime;
         targetDist = (transform.position - bInput.targetPos).magnitude - 1.2f;
@@ -120,7 +113,7 @@ public class BossController : MonoBehaviour
     }
     public void SetAnimParam()
     {
-        animator.SetFloat("Move", Mathf.Clamp01(velocity.magnitude*0.8f));
+        animator.SetFloat("Move",(Mathf.Abs(InAttackRange())< 0.1f)? 0 : 1);
 
         // start move in
         patternTimer -= Time.deltaTime;
@@ -128,10 +121,15 @@ public class BossController : MonoBehaviour
             animator.SetTrigger("Pattern");
 
         // start attack
-        //if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
-            //animator.SetTrigger("Attack");
+        if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
+            animator.SetTrigger("Attack");
     }
 
+    public float InAttackRange()
+    {
+        float dirSign = Mathf.Clamp(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist, -1, 1);
+        return ((bInput.targetPos - transform.position).magnitude / bPatterns[pIndex].pattern.attackDist) * dirSign;
+    }
     #region BossPattern
     [System.Serializable]
     public struct B_Pattern
