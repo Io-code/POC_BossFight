@@ -2,14 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName ="Pattern",menuName ="Scriptable/Pattern")]
-public class BossPattern : ScriptableObject
+[System.Serializable]
+public class BossPattern 
 {
-    public AnimationClip moveInClip, attackClip;
-    public float startDelay = 1; 
 
-    [Header("Trigger Attack")]
-    public float attackDist = 1; 
-    public float marginDist = 0.5f;
+        public ScriptablePattern pattern;
+        public List<NextPattern> nextPatterns;
     
 }

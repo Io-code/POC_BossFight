@@ -3300,26 +3300,37 @@ MonoBehaviour:
   bPatterns:
   - pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
     nextPatterns:
-    - pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
+    - name: Sword
+      pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
       weight: 1
-    - pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
+    - name: Dash
+      pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
       weight: 1
-    - pattern: {fileID: 11400000, guid: e56b46445c7f43f45b75d1f9e0d5925f, type: 2}
-      weight: 1.5
+    - name: KickOut
+      pattern: {fileID: 11400000, guid: e56b46445c7f43f45b75d1f9e0d5925f, type: 2}
+      weight: 1
   - pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
     nextPatterns:
-    - pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
-      weight: 1.5
-    - pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
+    - name: Sword
+      pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
       weight: 1
-    - pattern: {fileID: 11400000, guid: e56b46445c7f43f45b75d1f9e0d5925f, type: 2}
+    - name: Dash
+      pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
+      weight: 1
+    - name: KickOut
+      pattern: {fileID: 11400000, guid: e56b46445c7f43f45b75d1f9e0d5925f, type: 2}
       weight: 1
   - pattern: {fileID: 11400000, guid: e56b46445c7f43f45b75d1f9e0d5925f, type: 2}
     nextPatterns:
-    - pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
+    - name: Sword
+      pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
       weight: 1
-    - pattern: {fileID: 11400000, guid: 6aaffebeadee1ed41af364679c2750ff, type: 2}
+    - name: Dash
+      pattern: {fileID: 11400000, guid: 6762f1ff259ca9843bf9d58b1d0d6627, type: 2}
       weight: 1.5
+    - name: KickOut
+      pattern: {fileID: 11400000, guid: e56b46445c7f43f45b75d1f9e0d5925f, type: 2}
+      weight: 0.5
   pIndex: 2
   randP:
     serializedVersion: 2

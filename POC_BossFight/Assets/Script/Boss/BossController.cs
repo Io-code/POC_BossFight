@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BossController : MonoBehaviour
 {
-    public enum BossState { ATTACK, MOVE, FREE }
+    public enum BossState { ATTACK, FREE }
     public BossState bossState;
 
     public BossInput bInput;
@@ -15,8 +15,9 @@ public class BossController : MonoBehaviour
     public Animator animator;
     public AnimatorOverrideController overrider;
     public AnimationClip refAttackClip;
+
     [Header("Pattern")]
-    public List<B_Pattern> bPatterns;
+    public List<BossPattern> bPatterns;
     public int pIndex = 0;
     public AnimationCurve randP;
     float patternTimer = 0;
@@ -25,12 +26,14 @@ public class BossController : MonoBehaviour
     #region Suscribe Event
     private void OnEnable()
     {
-        BossSwitchState.OnEndPattern += SelectPattern;
+        BossSwitchState.OnStartPattern += SelectPattern;
+        BossSwitchState.OnEndAttack += EndPattern;
     }
 
     private void OnDisable()
     {
-        BossSwitchState.OnEndPattern -= SelectPattern;
+        BossSwitchState.OnStartPattern -= SelectPattern;
+        BossSwitchState.OnEndAttack -= EndPattern;
     }
     #endregion
 
@@ -45,6 +48,7 @@ public class BossController : MonoBehaviour
         Move();
         SetAnimParam();
     }
+    #region Pattern
     public void SelectPattern( Animator animator)
     {
         
@@ -52,6 +56,8 @@ public class BossController : MonoBehaviour
         {
             bossState = BossState.ATTACK;
             randP = new AnimationCurve();
+            randP.AddKey(0, 0);
+
             float pWeightSumm = 0;
             for(int i = 0; i< bPatterns[pIndex].nextPatterns.Count; i++)
             {
@@ -60,24 +66,14 @@ public class BossController : MonoBehaviour
             }
 
             float randChoose = Random.Range(0, pWeightSumm);
-            //pIndex = (int)randP.Evaluate(randChoose);
+            pIndex = (int)Mathf.Ceil(randP.Evaluate(randChoose));
             patternTimer = bPatterns[pIndex].pattern.startDelay;
-
-            // replace animation clip
-            //List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
-           // overrider.GetOverrides(overrides);
-            //Debug.Log("Pattern nb " + overrider.overridesCount);
-            //overrides[2] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[2].Key, bPatterns[pIndex].pattern.attackClip);
-            //overrides[1] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[1].Key, bPatterns[pIndex].pattern.moveInClip);
-
-            //overrider.ApplyOverrides(overrides);
-
-
             Debug.Log("Select pattern " + pIndex + " at " + randChoose + " range " + pWeightSumm);
+            SwitchAttackP(pIndex);
             
         }
     }
-    public void SwitchPattern()
+    public void SwitchAttackP( int index)
     {
         // replace animation clip
         List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
@@ -87,13 +83,33 @@ public class BossController : MonoBehaviour
         {
             Debug.Log("Override "+i+":" + overrides[i]);
             if(overrides[i].Key == refAttackClip )
-                overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[i].Key, bPatterns[pIndex].pattern.attackClip);
+                overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[i].Key, bPatterns[index].pattern.attackClip);
         }
         //overrides[2] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[2].Key, bPatterns[pIndex].pattern.attackClip);
         //overrides[1] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[1].Key, bPatterns[pIndex].pattern.moveInClip);
 
         overrider.ApplyOverrides(overrides);
     }
+    public void EndPattern(Animator animator)
+    {
+        bossState = BossState.FREE;
+    }
+    [ContextMenu("Update NextPattern")]
+    public void UpdateNextPattern()
+    {
+        for(int i = 0; i < bPatterns.Count;i++)
+        {
+            
+            for (int j = 0; j < bPatterns.Count; j++)
+            {
+                if (j < bPatterns[i].nextPatterns.Count)
+                    bPatterns[i].nextPatterns[j].pattern = bPatterns[j].pattern;
+                else
+                    bPatterns[i].nextPatterns.Add(new NextPattern(bPatterns[j].pattern, 1));
+            }
+        }
+    }
+    #endregion
 
     public void Move()
     {
@@ -109,19 +125,20 @@ public class BossController : MonoBehaviour
         targetDist = (transform.position - bInput.targetPos).magnitude - 1.2f;
 
         if (!bInput.lockDir) 
-            transform.right = (velocity != Vector3.zero)? velocity.normalized : bInput.targetDir;
+            transform.right = (velocity.magnitude > 10f)? velocity.normalized : bInput.targetDir;
     }
     public void SetAnimParam()
     {
         animator.SetFloat("Move",(Mathf.Abs(InAttackRange())< 0.1f)? 0 : 1);
 
-        // start move in
-        patternTimer -= Time.deltaTime;
-        if (patternTimer <= 0)
-            animator.SetTrigger("Pattern");
-
         // start attack
         if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
+            bossState = BossState.ATTACK;
+
+        if(bossState == BossState.ATTACK)
+            patternTimer -= Time.deltaTime;
+
+        if (patternTimer <= 0)
             animator.SetTrigger("Attack");
     }
 
@@ -130,26 +147,16 @@ public class BossController : MonoBehaviour
         float dirSign = Mathf.Clamp(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist, -1, 1);
         return ((bInput.targetPos - transform.position).magnitude / bPatterns[pIndex].pattern.attackDist) * dirSign;
     }
-    #region BossPattern
-    [System.Serializable]
-    public struct B_Pattern
-    {
-        public BossPattern pattern;
-        public List<NextPattern> nextPatterns;
-    }
 
-    [System.Serializable]
-    public struct NextPattern
-    {
-        public BossPattern pattern;
-        public float weight ;
-    }
-    #endregion
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(bInput.targetPos, bPatterns[pIndex].pattern.attackDist);
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(bInput.targetPos + (bPatterns[pIndex].pattern.attackDist - bPatterns[pIndex].pattern.marginDist) * -bInput.targetDir, bInput.targetPos + (bPatterns[pIndex].pattern.attackDist + bPatterns[pIndex].pattern.marginDist) * -bInput.targetDir);
+        if(pIndex < bPatterns.Count)
+        {
+            Gizmos.DrawWireSphere(bInput.targetPos, bPatterns[pIndex].pattern.attackDist);
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(bInput.targetPos + (bPatterns[pIndex].pattern.attackDist - bPatterns[pIndex].pattern.marginDist) * -bInput.targetDir, bInput.targetPos + (bPatterns[pIndex].pattern.attackDist + bPatterns[pIndex].pattern.marginDist) * -bInput.targetDir);
+        }
     }
+        
 }
