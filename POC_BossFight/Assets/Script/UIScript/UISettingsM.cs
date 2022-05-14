@@ -5,7 +5,7 @@ using UnityEngine;
 public class UISettingsM : MonoBehaviour
 {
     public UIPatternS[] patternSettings;
-    [HideInInspector] public BossPattern bossP;
+    public BossPattern bossP;
 
     private void Update()
     {
@@ -14,6 +14,7 @@ public class UISettingsM : MonoBehaviour
             for(int i = 0; i < bossP.nextPatterns.Count; i++)
             {
                 bossP.nextPatterns[i].weight = patternSettings[i].slider.value;
+                patternSettings[i].icon.sprite = bossP.nextPatterns[i].pattern.icon;
             }
         }
     }

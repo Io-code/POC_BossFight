@@ -6,6 +6,7 @@ public class UIBossM : MonoBehaviour
 {
     public static UIBossM instance;
     public BossController bossC;
+    public UIStatsM statsM;
 
     [Header("Pattern")]
     public RectTransform patternCanvas;
@@ -13,12 +14,23 @@ public class UIBossM : MonoBehaviour
 
     public List<UIPatternM> patterns;
     IDictionary<UIPatternM, BossPattern> patternD = new Dictionary<UIPatternM, BossPattern>();
-    
+    bool patternDetect;
 
     [Header("Settings")]
     public UISettingsM settingsG;
     public UIPatternM displayPattern;
     UIPatternM virtualDisplayP;
+    #region Suscribe Event
+    private void OnEnable()
+    {
+        BossSwitchState.OnEndAttack += ResetPatternCount;
+    }
+
+    private void OnDisable()
+    {
+        BossSwitchState.OnEndAttack -= ResetPatternCount;
+    }
+    #endregion
 
     private void Awake()
     {
@@ -29,22 +41,35 @@ public class UIBossM : MonoBehaviour
     }
     private void Update()
     {
+
         for(int i = 0; i < patterns.Count; i++)
         {
+            // setup color
             Color newCol = patterns[i].hightLight.color;
             float alpha = patterns[i].hightLight.color.a;
             float speed = (Time.deltaTime / 0.5f);
-            if (bossC.bPatterns[bossC.pIndex] == patternD[patterns[i]])
-                alpha = Mathf.Clamp01(alpha+speed);
+
+            if (bossC.pIndex < bossC.bPatterns.Count && bossC.bPatterns[bossC.pIndex] == patternD[patterns[i]])
+            {
+                alpha = Mathf.Clamp01(alpha + speed);
+                if(patternDetect)
+                {
+                    patternDetect = false;
+                    Debug.Log("Trigger Pattern");
+                    statsM.LoadStat(i);
+                }
+            }  
             else
                 alpha = Mathf.Clamp01(alpha - speed);
             newCol = new Color(newCol.r, newCol.g, newCol.b, alpha);
             patterns[i].hightLight.color = newCol;
         }
+        
     }
 
     public void RemovePattern(UIPatternM pattern)
     {
+
         patterns.Remove(pattern);
 
         bossC.bPatterns.Remove(patternD[pattern]);
@@ -55,12 +80,16 @@ public class UIBossM : MonoBehaviour
         if (patterns.Count <= 0)
             DisplayPatternSettings(null, false);
 
-        if(virtualDisplayP)
+        if (virtualDisplayP != null && patternD.ContainsKey(virtualDisplayP))
             settingsG.LoadVisual(patternD[virtualDisplayP]);
 
         // reset color
         Color newCol = pattern.hightLight.color;
         pattern.hightLight.color = new Color(newCol.r, newCol.g, newCol.b, 0);
+
+        // reset stat
+        statsM.ResetProba();
+        
     }
     public void AddPattern(UIPatternM pattern)
     {
@@ -73,16 +102,22 @@ public class UIBossM : MonoBehaviour
         bossC.bPatterns.Add(patternD[pattern]);
         bossC.UpdateNextPattern();
 
-        if (virtualDisplayP)
+        if (virtualDisplayP && patternD.ContainsKey(virtualDisplayP))
             settingsG.LoadVisual(patternD[virtualDisplayP]);
+
+        // reset stat
+        statsM.ResetProba();
     }
 
     public void DisplayPatternSettings(UIPatternM pattern, bool display)
     {
+        settingsG.gameObject.SetActive(display);
+        if (!display)
+            return;
+
         if (virtualDisplayP && virtualDisplayP != pattern)
             virtualDisplayP.displayS = false;
 
-        settingsG.gameObject.SetActive(display);
         virtualDisplayP = pattern;
 
         if (virtualDisplayP)
@@ -91,5 +126,13 @@ public class UIBossM : MonoBehaviour
             displayPattern.UpdateVisual();
             settingsG.LoadVisual(patternD[virtualDisplayP]);
         } 
+    }
+
+    void ResetPatternCount( Animator animator)
+    {
+        if(animator == bossC.animator)
+        {
+            patternDetect = true;
+        }
     }
 }

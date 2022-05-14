@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2d4b55d5c0c0e34bb080f3237aaf41e, type: 3}
   m_Name: KickOut
   m_EditorClassIdentifier: 
-  icon: {fileID: -2413806693520163455, guid: 315e1ec039b034d48b6d29fbcd120160, type: 3}
+  icon: {fileID: 21300000, guid: 591ec81141f81474ab5910cf6e7fb9b3, type: 3}
   attackClip: {fileID: 7400000, guid: ca22a30908fae164180c52d7d769dcf3, type: 2}
   startDelay: 1
   attackDist: 1.5

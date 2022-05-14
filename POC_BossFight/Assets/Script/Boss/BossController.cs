@@ -116,9 +116,9 @@ public class BossController : MonoBehaviour
             for (int j = 0; j < bPatterns.Count; j++)
             {
                 NextPattern nextP;
-                if (j < bPatterns[i].nextPatterns.Count)
+                /*if (j < bPatterns[i].nextPatterns.Count)
                     nextP = bPatterns[i].nextPatterns[j];
-                else
+                else*/
                     nextP = new NextPattern(bPatterns[j].pattern, 1);
 
                 Debug.Log("Next p " + nextP);

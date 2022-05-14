@@ -9,6 +9,7 @@ public class UIPatternS : MonoBehaviour
     int maxValue = 4;
     public Slider slider;
     public TextMeshProUGUI valueT;
+    public Image icon;
     char[] valueCharr;
     private void Awake()
     {

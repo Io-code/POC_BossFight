@@ -37,8 +37,10 @@ public class UIPatternM : MonoBehaviour
         else 
         {
             displayS = false;
-           UIBossM.instance.RemovePattern(this);
-           UIPatternK.instance.AddPattern(this);
+            UIBossM.instance.DisplayPatternSettings(this, false);
+
+            UIBossM.instance.RemovePattern(this);
+            UIPatternK.instance.AddPattern(this);
         }
     }
     public void DisplaySettings()

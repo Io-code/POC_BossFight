@@ -451,6 +451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slider: {fileID: 7030233886800480860}
   valueT: {fileID: 7030233885307374957}
+  icon: {fileID: 7030233885380998778}
 --- !u!1 &7030233885705776984
 GameObject:
   m_ObjectHideFlags: 0
