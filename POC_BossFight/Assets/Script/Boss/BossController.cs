@@ -20,7 +20,7 @@ public class BossController : MonoBehaviour
     public List<BossPattern> bPatterns;
     public int pIndex = 0;
     public AnimationCurve randP;
-    float patternTimer = 0;
+    float patternTimer = 1;
 
 
     #region Suscribe Event
@@ -52,8 +52,15 @@ public class BossController : MonoBehaviour
     public void SelectPattern( Animator animator)
     {
         
-        if(animator == this.animator)
+        if(animator == this.animator )
         {
+            if(pIndex >= bPatterns.Count)
+            {
+                pIndex =(int)Mathf.Clamp(bPatterns.Count - 1,0, (bPatterns.Count));
+                patternTimer = 1;
+                return;
+            }
+
             bossState = BossState.ATTACK;
             randP = new AnimationCurve();
             randP.AddKey(0, 0);
@@ -67,9 +74,13 @@ public class BossController : MonoBehaviour
 
             float randChoose = Random.Range(0, pWeightSumm);
             pIndex = (int)Mathf.Ceil(randP.Evaluate(randChoose));
-            patternTimer = bPatterns[pIndex].pattern.startDelay;
-            Debug.Log("Select pattern " + pIndex + " at " + randChoose + " range " + pWeightSumm);
-            SwitchAttackP(pIndex);
+            if(pIndex < bPatterns.Count)
+            {
+                patternTimer = bPatterns[pIndex].pattern.startDelay;
+                //Debug.Log("Select pattern " + pIndex + " at " + randChoose + " range " + pWeightSumm);
+                SwitchAttackP(pIndex);
+            }
+            
             
         }
     }
@@ -78,10 +89,10 @@ public class BossController : MonoBehaviour
         // replace animation clip
         List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
         overrider.GetOverrides(overrides);
-        Debug.Log("Pattern nb " + overrides.Count);
+        //Debug.Log("Pattern nb " + overrides.Count);
         for (int i = 0; i < overrides.Count; i++)
         {
-            Debug.Log("Override "+i+":" + overrides[i]);
+           // Debug.Log("Override "+i+":" + overrides[i]);
             if(overrides[i].Key == refAttackClip )
                 overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[i].Key, bPatterns[index].pattern.attackClip);
         }
@@ -97,16 +108,38 @@ public class BossController : MonoBehaviour
     [ContextMenu("Update NextPattern")]
     public void UpdateNextPattern()
     {
-        for(int i = 0; i < bPatterns.Count;i++)
+       
+        for (int i = 0; i < bPatterns.Count;i++)
         {
-            
+            List<NextPattern> newNextP = new List<NextPattern>();
+            //Debug.Log("Next U p " + newNextP.Count +" " +bPatterns.Count);
             for (int j = 0; j < bPatterns.Count; j++)
             {
+                NextPattern nextP;
                 if (j < bPatterns[i].nextPatterns.Count)
-                    bPatterns[i].nextPatterns[j].pattern = bPatterns[j].pattern;
+                    nextP = bPatterns[i].nextPatterns[j];
                 else
-                    bPatterns[i].nextPatterns.Add(new NextPattern(bPatterns[j].pattern, 1));
+                    nextP = new NextPattern(bPatterns[j].pattern, 1);
+
+                Debug.Log("Next p " + nextP);
+                newNextP.Add(nextP);
             }
+
+            bPatterns[i].nextPatterns.Clear();
+            foreach (NextPattern np in newNextP)
+            {
+                bPatterns[i].nextPatterns.Add(np);
+            }
+
+                /*
+                for (int j = 0; j < bPatterns.Count; j++)
+                {
+
+                    if (j < bPatterns[i].nextPatterns.Count)
+                        bPatterns[i].nextPatterns[j].pattern = bPatterns[j].pattern;
+                    else
+                        bPatterns[i].nextPatterns.Add(new NextPattern(bPatterns[j].pattern, 1));
+                }*/
         }
     }
     #endregion
@@ -132,20 +165,30 @@ public class BossController : MonoBehaviour
         animator.SetFloat("Move",(Mathf.Abs(InAttackRange())< 0.1f)? 0 : 1);
 
         // start attack
-        if (Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
+        if (pIndex < bPatterns.Count && Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
             bossState = BossState.ATTACK;
 
         if(bossState == BossState.ATTACK)
             patternTimer -= Time.deltaTime;
 
         if (patternTimer <= 0)
+        {
+            patternTimer = 10; // debug height value
             animator.SetTrigger("Attack");
+        }
+            
     }
 
     public float InAttackRange()
     {
-        float dirSign = Mathf.Clamp(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist, -1, 1);
-        return ((bInput.targetPos - transform.position).magnitude / bPatterns[pIndex].pattern.attackDist) * dirSign;
+        if (pIndex < bPatterns.Count)
+        {
+            float dirSign = Mathf.Clamp(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist, -1, 1);
+            return ((bInput.targetPos - transform.position).magnitude / bPatterns[pIndex].pattern.attackDist) * dirSign;
+        }
+        else
+            return 0;
+      
     }
 
 

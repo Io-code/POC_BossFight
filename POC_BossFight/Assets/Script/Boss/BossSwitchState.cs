@@ -9,8 +9,7 @@ public class BossSwitchState : StateMachineBehaviour
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
 	{
 
-		if (stateInfo.IsName("Free"))
-			OnStartPattern(animator);
+		
 
 	}
 
@@ -27,5 +26,8 @@ public class BossSwitchState : StateMachineBehaviour
 
 		if (stateInfo.IsName("Attack"))
 			OnEndAttack(animator);
+
+		if (stateInfo.IsName("Attack"))
+			OnStartPattern(animator);
 	}
 }

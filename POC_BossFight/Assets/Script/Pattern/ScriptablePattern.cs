@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName ="Pattern",menuName ="Scriptable/Pattern")]
 public class ScriptablePattern : ScriptableObject
 {
+    public Sprite icon;
     public AnimationClip attackClip;
     public float startDelay = 1; 
 
