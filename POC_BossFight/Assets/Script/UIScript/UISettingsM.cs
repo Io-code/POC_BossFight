@@ -7,6 +7,16 @@ public class UISettingsM : MonoBehaviour
     public UIPatternS[] patternSettings;
     [HideInInspector] public BossPattern bossP;
 
+    private void Update()
+    {
+        if (bossP != null)
+        {
+            for(int i = 0; i < bossP.nextPatterns.Count; i++)
+            {
+                bossP.nextPatterns[i].weight = patternSettings[i].slider.value;
+            }
+        }
+    }
     public void LoadVisual( BossPattern bossP)
     {
         this.bossP = bossP;

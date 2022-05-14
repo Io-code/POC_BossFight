@@ -7,6 +7,8 @@ using TMPro;
 public class UIPatternM : MonoBehaviour
 {
     public RectTransform rt;
+    public Image hightLight;
+    [HideInInspector] public float intensity = 0;
     [Header("Pattern")]
     public ScriptablePattern patternScr;
 

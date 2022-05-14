@@ -27,6 +27,21 @@ public class UIBossM : MonoBehaviour
         else if (instance != this)
             Destroy(this);
     }
+    private void Update()
+    {
+        for(int i = 0; i < patterns.Count; i++)
+        {
+            Color newCol = patterns[i].hightLight.color;
+            float alpha = patterns[i].hightLight.color.a;
+            float speed = (Time.deltaTime / 0.5f);
+            if (bossC.bPatterns[bossC.pIndex] == patternD[patterns[i]])
+                alpha = Mathf.Clamp01(alpha+speed);
+            else
+                alpha = Mathf.Clamp01(alpha - speed);
+            newCol = new Color(newCol.r, newCol.g, newCol.b, alpha);
+            patterns[i].hightLight.color = newCol;
+        }
+    }
 
     public void RemovePattern(UIPatternM pattern)
     {
@@ -42,6 +57,10 @@ public class UIBossM : MonoBehaviour
 
         if(virtualDisplayP)
             settingsG.LoadVisual(patternD[virtualDisplayP]);
+
+        // reset color
+        Color newCol = pattern.hightLight.color;
+        pattern.hightLight.color = new Color(newCol.r, newCol.g, newCol.b, 0);
     }
     public void AddPattern(UIPatternM pattern)
     {
