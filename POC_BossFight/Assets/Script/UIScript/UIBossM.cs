@@ -113,10 +113,18 @@ public class UIBossM : MonoBehaviour
     {
         settingsG.gameObject.SetActive(display);
         if (!display)
+        {
+            virtualDisplayP.buttonIconSettings.color = virtualDisplayP.normalColor;
             return;
+        }
+            
 
         if (virtualDisplayP && virtualDisplayP != pattern)
+        {
+            virtualDisplayP.buttonIconSettings.color = virtualDisplayP.normalColor;
             virtualDisplayP.displayS = false;
+        }
+            
 
         virtualDisplayP = pattern;
 
@@ -125,6 +133,7 @@ public class UIBossM : MonoBehaviour
             displayPattern.patternScr = virtualDisplayP.patternScr;
             displayPattern.UpdateVisual();
             settingsG.LoadVisual(patternD[virtualDisplayP]);
+            virtualDisplayP.buttonIconSettings.color = virtualDisplayP.selectColor;
         } 
     }
 

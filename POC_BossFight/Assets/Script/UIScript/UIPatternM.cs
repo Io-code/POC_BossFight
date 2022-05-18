@@ -8,6 +8,7 @@ public class UIPatternM : MonoBehaviour
 {
     public RectTransform rt;
     public Image hightLight;
+    public Image buttonIconSettings;
     [HideInInspector] public float intensity = 0;
     [Header("Pattern")]
     public ScriptablePattern patternScr;
@@ -16,6 +17,7 @@ public class UIPatternM : MonoBehaviour
     public Image icon;
     public bool attribute;
 
+    public Color selectColor, normalColor;
     [HideInInspector]public bool displayS;
     private void Awake()
     {
@@ -29,6 +31,7 @@ public class UIPatternM : MonoBehaviour
         {
             if(UIBossM.instance.patterns.Count < UIBossM.instance.maxPattern)
             {
+                buttonIconSettings.gameObject.SetActive(true);
                 UIBossM.instance.AddPattern(this);
                 UIPatternK.instance.RemovePattern(this);
             }
@@ -37,6 +40,7 @@ public class UIPatternM : MonoBehaviour
         else 
         {
             displayS = false;
+            buttonIconSettings.gameObject. SetActive(true);
             UIBossM.instance.DisplayPatternSettings(this, false);
 
             UIBossM.instance.RemovePattern(this);

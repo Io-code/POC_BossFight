@@ -15,7 +15,7 @@ public class BossController : MonoBehaviour
     public Animator animator;
     public AnimatorOverrideController overrider;
     public AnimationClip refAttackClip;
-
+    float move;
     [Header("Pattern")]
     public List<BossPattern> bPatterns;
     public int pIndex = 0;
@@ -41,7 +41,19 @@ public class BossController : MonoBehaviour
     {
         //pIndex = Random.Range(0, bPatterns.Count);
         animator.runtimeAnimatorController = overrider;
-        
+
+        List<KeyValuePair<AnimationClip, AnimationClip>> overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(overrider.overridesCount);
+        overrider.GetOverrides(overrides);
+        //Debug.Log("Pattern nb " + overrides.Count);
+        for (int i = 0; i < overrides.Count; i++)
+        {
+            // Debug.Log("Override "+i+":" + overrides[i]);
+            if (overrides[i].Key == refAttackClip)
+                overrides[i] = new KeyValuePair<AnimationClip, AnimationClip>(overrides[i].Key, null);
+        }
+
+        overrider.ApplyOverrides(overrides);
+
     }
     private void Update()
     {
@@ -162,14 +174,21 @@ public class BossController : MonoBehaviour
     }
     public void SetAnimParam()
     {
-        animator.SetFloat("Move",(Mathf.Abs(InAttackRange())< 0.1f)? 0 : 1);
+        //Mathf.Clamp01(Mathf.Abs(InAttackRange()) - 0.1)
+        //if(bossState == BossState.FREE)
+        move = Mathf.Clamp01((Mathf.Abs(InAttackRange()) < 0.1) ? move -= Time.deltaTime : move += Time.deltaTime);
+            animator.SetFloat("Move",move);
 
         // start attack
         if (pIndex < bPatterns.Count && Mathf.Abs(Vector3.Distance(transform.position, bInput.targetPos) - bPatterns[pIndex].pattern.attackDist) < bPatterns[pIndex].pattern.marginDist * 0.5f)
             bossState = BossState.ATTACK;
 
         if(bossState == BossState.ATTACK)
+        {
             patternTimer -= Time.deltaTime;
+            animator.SetFloat("Move", 0);
+        }
+            
 
         if (patternTimer <= 0)
         {
